@@ -1,0 +1,16 @@
+---
+- name: restart haproxy
+  ansible.builtin.service: 
+    name=haproxy 
+    state=restarted
+  become: true
+  tags:
+    restart
+
+- name: reload haproxy
+  ansible.builtin.service: 
+    name=haproxy 
+    state=reloaded
+  become: true
+  tags:
+    configfile

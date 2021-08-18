@@ -1,0 +1,48 @@
+---
+
+- name: Add haproxy repo
+  ansible.builtin.apt_repository: 
+    repo='ppa:vbernat/haproxy-1.8'
+  become: true
+  when: ansible_os_family == 'Debian'
+
+- name: Install haproxy (Debian)
+  ansible.builtin.apt: 
+    name=haproxy 
+    state=latest 
+    update_cache=yes
+  become: true
+  when: ansible_os_family == 'Debian'
+
+- name: Install haproxy config file
+  template: src=haproxy.cfg dest=/etc/haproxy/haproxy.cfg
+  become: true
+  notify: reload haproxy
+  tags:
+    - configfile
+
+- name: Install socat (Debian)
+  ansible.builtin.apt: 
+    name=socat 
+    state=latest 
+    update_cache=yes
+  become: true
+  when: ansible_os_family == 'Debian'
+
+- name: Start and enable haproxy service
+  ansible.builtin.service: 
+    name=haproxy 
+    state=started 
+    enabled=yes
+  become: true
+
+- name: Create log directory
+  ansible.builtin.file: 
+    path="/var/log/haproxy" 
+    state=directory 
+    owner=root 
+    group=haproxy 
+    mode=0755
+  become: true
+  notify:
+    - restart haproxy
